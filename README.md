@@ -32,7 +32,7 @@ The `DMD_COLOR_MODE` environment variable will be either set to `light` or `dark
 
 ### Example
 
-The intended use of this program was to sync theming environment variables, such as [difftastics `DFT_BACKGROUND`](https://github.com/Wilfred/difftastic) or [bats `BAT_THEME`](https://github.com/sharkdp/bat) with the current operating system color scheme.
+The original motivation for creating this program was to sync theming environment variables, such as [difftastics `DFT_BACKGROUND`](https://github.com/Wilfred/difftastic) or [bats `BAT_THEME`](https://github.com/sharkdp/bat) with the current operating system color scheme.
 But lets use a more impractical example.
 
 MacOS includes `say`, a text-to-speech program available on the command line.
