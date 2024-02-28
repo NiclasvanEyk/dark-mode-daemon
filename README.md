@@ -10,33 +10,67 @@ For now, simply use [Homebrew](https://brew.sh) is the easiest option:
 # 1. Install the binary
 brew install NiclasvanEyk/dark-mode-daemon/dark-mode-daemon
 
-# 2. Launch the daemon when logging in
+# 2. (optional) Launch the daemon on system start
 brew services start dark-mode-daemon
 ```
 
+Note that if you don't run the second step, you can still manually watch for changes using `dark-mode-daemon daemon`.
+
 ## Usage
 
-Place executable scripts in one of the following locations:
+Create a new directory for scripts that should be run when changing color modes:
 
-  - `$XDG_CONFIG_HOME/dark-mode-daemon/scripts`
-  - `$HOME/.config/dark-mode-daemon/scripts`
+```shell
+mkdir $HOME/.config/dark-mode-daemon/scripts
+```
 
-You can use the following as an example
+> Alternatively use `$XDG_CONFIG_HOME` instead of `$HOME/.config` if you configured it
 
-```bash
+Then create as many scripts there as you like, but don't forget to make them executable.
+They will be automatically be run when changing between dark and light mode.
+The `DMD_COLOR_MODE` environment variable will be either set to `light` or `dark`, depending on the new mode.
+
+### Example
+
+The intended use of this program was to sync theming environment variables, such as [difftastics `DFT_BACKGROUND`](https://github.com/Wilfred/difftastic) or [bats `BAT_THEME`](https://github.com/sharkdp/bat) with the current operating system color scheme.
+But lets use a more impractical example.
+
+MacOS includes `say`, a text-to-speech program available on the command line.
+We can use this to loudly announce our dark mode changes.
+
+First we create the script 
+
+```shell
+touch $HOME/.config/dark-mode-daemon/scripts/announce.sh
+```
+
+Then fill it with the following content
+
+```shell
 #!/usr/bin/env bash
 
 say "Changed to $DMD_COLOR_MODE mode"
 ```
 
-Dont forget to make it executable (`chmod +x myscript.sh`)!
-Then, if not automatically run at startup through Homebrew, run
+finally make it executable
 
 ```shell
-dark-mode-daemon daemon
+chmod +x $HOME/.config/dark-mode-daemon/scripts/announce.sh
 ```
 
-to begin listening for color mode changes.
+You can verify that it will be run using
 
-If you used the example, you should hear the phrase "Changed to dark mode".
+```shell
+dark-mode-daemon list
+```
 
+this should print something like the following:
+
+```
+📂 Using scripts in /Users/youruser/.config/dark-mode-daemon/scripts...
+
+/Users/youruser/.config/dark-mode-daemon/scripts/announce.sh
+```
+
+Now turn your volume up, toggle dark mode, and be amazed at the result.
+Or create more useful scripts that adjust your terminal emulator, vim/emacs/editor theme, or something totally different.
