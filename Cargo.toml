@@ -1,0 +1,7 @@
+[package]
+name = "dark-mode-daemon"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+xdg = "2.5.2"
