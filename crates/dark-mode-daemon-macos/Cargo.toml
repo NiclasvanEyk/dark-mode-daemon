@@ -1,0 +1,7 @@
+[package]
+name = "dark-mode-daemon-macos"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dark-mode-daemon = { path = "../dark-mode-daemon" }
