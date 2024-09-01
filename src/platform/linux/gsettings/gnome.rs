@@ -1,4 +1,4 @@
-use dark_mode_daemon::ColorMode;
+use crate::ColorMode;
 use gio::{prelude::SettingsExtManual, Settings};
 
 use super::SettingsProvider;

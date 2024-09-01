@@ -1,12 +1,12 @@
 use std::error::Error;
 
+use crate::{execution::run_scripts, platform_specifics::NativeAdapter, ColorMode};
 use block2::RcBlock;
-use dark_mode_daemon::{execution::run_scripts, platform_specifics::NativeAdapter, ColorMode};
 use objc2_app_kit::NSApplication;
 use objc2_foundation::{ns_string, MainThreadMarker, NSDistributedNotificationCenter};
 
 #[derive(Default)]
-struct MacOSNativeAdapter {}
+pub(crate) struct MacOSNativeAdapter {}
 
 fn current_mode() -> Result<ColorMode, Box<dyn Error>> {
     unsafe {
@@ -56,8 +56,4 @@ impl NativeAdapter for MacOSNativeAdapter {
     fn current_mode(&self) -> Result<ColorMode, Box<dyn Error>> {
         current_mode()
     }
-}
-
-fn main() {
-    dark_mode_daemon::cli::run(MacOSNativeAdapter::default());
 }

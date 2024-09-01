@@ -132,27 +132,13 @@ checksum = "d3fd119d74b830634cea2a0f58bbd0d54540518a14397557951e79340abc28c0"
 name = "dark-mode-daemon"
 version = "0.1.0"
 dependencies = [
- "clap",
- "xdg",
-]
-
-[[package]]
-name = "dark-mode-daemon-linux"
-version = "0.1.0"
-dependencies = [
- "dark-mode-daemon",
- "gio",
-]
-
-[[package]]
-name = "dark-mode-daemon-macos"
-version = "0.1.0"
-dependencies = [
  "block2",
- "dark-mode-daemon",
+ "clap",
+ "gio",
  "objc2",
  "objc2-app-kit",
  "objc2-foundation",
+ "xdg",
 ]
 
 [[package]]

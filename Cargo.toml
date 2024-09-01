@@ -1,3 +1,28 @@
-[workspace]
-resolver = "2"
-members = ["crates/*"]
+[package]
+name = "dark-mode-daemon"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+xdg = "2.5.2"
+clap = { version = "4.5.16", features = ["derive"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+block2 = "0.5.1"
+objc2 = { version = "0.5.2" }
+objc2-app-kit = { version = "0.2.2", features = [
+  "NSApplication",
+  "NSResponder",
+] }
+objc2-foundation = { version = "0.2.2", features = [
+  "NSNotification",
+  "NSDistributedNotificationCenter",
+  "NSOperation",
+  "NSString",
+  "NSThread",
+  "NSUserDefaults",
+  "block2",
+] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gio = "0.20.1"

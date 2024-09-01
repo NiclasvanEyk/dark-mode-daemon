@@ -1,8 +1,0 @@
-[package]
-name = "dark-mode-daemon-linux"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-dark-mode-daemon = { path = "../dark-mode-daemon" }
-gio = "0.20.1"

@@ -4,8 +4,8 @@ use std::result::Result;
 use std::sync::mpsc::{channel, Receiver};
 use std::{marker::PhantomData, sync::mpsc::Sender};
 
-use dark_mode_daemon::execution::run_scripts;
-use dark_mode_daemon::{platform_specifics::NativeAdapter, ColorMode};
+use crate::execution::run_scripts;
+use crate::{platform_specifics::NativeAdapter, ColorMode};
 use gio::prelude::ObjectExt;
 use gio::Settings;
 

@@ -1,9 +1,0 @@
-[package]
-name = "dark-mode-daemon"
-description = "The core logic for the os-specific dark-mode-daemon binaries."
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-xdg = "2.5.2"
-clap = { version = "4.5.16", features = ["derive"] }
