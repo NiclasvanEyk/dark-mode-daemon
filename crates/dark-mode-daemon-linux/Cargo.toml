@@ -5,5 +5,4 @@ edition = "2021"
 
 [dependencies]
 dark-mode-daemon = { path = "../dark-mode-daemon" }
-gsettings-desktop-schemas = "0.3.1"
 gio = "0.20.1"

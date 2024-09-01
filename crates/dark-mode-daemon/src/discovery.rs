@@ -17,10 +17,22 @@ pub(crate) enum ScriptsDirectoryError {
     Unreadable(PathBuf),
 }
 
-pub(crate) enum ScriptsDirectoryEntry {
-    Script(PathBuf),
-    Directory(PathBuf),
-    NonExecutableFile(PathBuf),
+pub(crate) enum ScriptsDirectoryEntryKind {
+    Script,
+    Directory,
+    NonExecutableFile,
+}
+
+pub(crate) struct ScriptsDirectoryEntry {
+    /// What type of entry this is.
+    pub kind: ScriptsDirectoryEntryKind,
+
+    /// The pathbuf pointing to the file descriptor in the scripts directory.
+    pub script: PathBuf,
+
+    /// The actual script location, wich may differ from
+    /// [`ScriptsDirectoryEntry::script`], when dealing with symlinks.
+    pub target: PathBuf,
 }
 
 #[derive(Debug)]
@@ -71,59 +83,48 @@ impl Iterator for ScriptsDirectory {
             }
         };
 
-        let mut path_buf = dir_entry.path();
-        let mut metadata = match dir_entry.metadata() {
-            Ok(metadata) => metadata,
+        let original_path_buf = dir_entry.path();
+        let path_buf = match canonicalize(original_path_buf.clone()) {
+            Ok(path) => path,
             Err(error) => {
-                return Some(Err(ScriptsDirectoryEntryError::FailedToReadMetadata {
-                    source: path_buf,
+                return Some(Err(ScriptsDirectoryEntryError::FailedToResolveSymlink {
+                    source: original_path_buf,
                     error,
                 }));
             }
         };
 
-        // There is some duplication here that would be nice to unify, but we
-        // basically repeat the above logic again and again if the file is
-        // symlinked.
-        loop {
-            if !metadata.is_symlink() {
-                break;
+        let metadata = match path_buf.metadata() {
+            Ok(metadata) => metadata,
+            Err(error) => {
+                return Some(Err(ScriptsDirectoryEntryError::FailedToReadMetadata {
+                    source: original_path_buf,
+                    error,
+                }));
             }
-
-            match canonicalize(&path_buf) {
-                Ok(new_path_buf) => {
-                    path_buf = new_path_buf;
-                }
-                Err(error) => {
-                    return Some(Err(ScriptsDirectoryEntryError::FailedToResolveSymlink {
-                        source: path_buf,
-                        error,
-                    }))
-                }
-            };
-
-            match path_buf.metadata() {
-                Ok(new_metadata) => {
-                    metadata = new_metadata;
-                }
-                Err(error) => {
-                    return Some(Err(ScriptsDirectoryEntryError::FailedToReadMetadata {
-                        source: path_buf,
-                        error,
-                    }))
-                }
-            };
-        }
+        };
 
         if !metadata.is_file() {
-            return Some(Ok(ScriptsDirectoryEntry::Directory(path_buf)));
+            return Some(Ok(ScriptsDirectoryEntry {
+                kind: ScriptsDirectoryEntryKind::Directory,
+                script: original_path_buf,
+                target: path_buf,
+            }));
         }
 
         let is_executable = metadata.permissions().mode() & 0o111 != 0;
         if !is_executable {
-            return Some(Ok(ScriptsDirectoryEntry::NonExecutableFile(path_buf)));
+            return Some(Ok(ScriptsDirectoryEntry {
+                kind: ScriptsDirectoryEntryKind::NonExecutableFile,
+                script: original_path_buf,
+                target: path_buf,
+            }));
         }
 
-        Some(Ok(ScriptsDirectoryEntry::Script(path_buf)))
+        Some(Ok(ScriptsDirectoryEntry {
+            kind: ScriptsDirectoryEntryKind::Script,
+            script: original_path_buf,
+            target: path_buf,
+        }))
     }
 }

@@ -1,6 +1,6 @@
 use std::process::{exit, Command, Stdio};
 
-use crate::{discovery::ScriptsDirectoryEntry, ColorMode};
+use crate::{discovery::ScriptsDirectoryEntryKind, ColorMode};
 
 pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
     let scripts_directory = match crate::discovery::ScriptsDirectory::read() {
@@ -23,27 +23,31 @@ pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
             }
         };
 
-        match entry {
-            ScriptsDirectoryEntry::Directory(path) => {
-                if verbose {
-                    println!("Skipping directory at '{}'...", path.to_string_lossy());
-                }
-                continue;
-            }
-            ScriptsDirectoryEntry::NonExecutableFile(path) => {
+        match entry.kind {
+            ScriptsDirectoryEntryKind::Directory => {
                 if verbose {
                     println!(
-                        "Skipping non-executable file at '{}'...",
-                        path.to_string_lossy()
+                        "Skipping directory at '{}'...",
+                        entry.target.to_string_lossy()
                     );
                 }
                 continue;
             }
-            ScriptsDirectoryEntry::Script(path) => {
+            ScriptsDirectoryEntryKind::NonExecutableFile => {
                 if verbose {
-                    println!("🚀 Executing '{}'...", path.to_string_lossy());
+                    println!(
+                        "Skipping non-executable file at '{}'...",
+                        entry.target.to_string_lossy()
+                    );
+                }
+                continue;
+            }
+            ScriptsDirectoryEntryKind::Script => {
+                if verbose {
+                    println!("🚀 Executing '{}'...", entry.target.to_string_lossy());
                 }
 
+                let path = entry.target;
                 let mut command = Command::new(&path);
                 command.env("DMD_COLOR_MODE", mode.to_string());
 

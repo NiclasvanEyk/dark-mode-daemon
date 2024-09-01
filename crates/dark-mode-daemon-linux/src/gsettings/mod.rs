@@ -1,5 +1,10 @@
+use std::boxed::Box;
+use std::error::Error;
+use std::result::Result;
+use std::sync::mpsc::{channel, Receiver};
 use std::{marker::PhantomData, sync::mpsc::Sender};
 
+use dark_mode_daemon::execution::run_scripts;
 use dark_mode_daemon::{platform_specifics::NativeAdapter, ColorMode};
 use gio::prelude::ObjectExt;
 use gio::Settings;
@@ -50,7 +55,9 @@ impl<Provider> NativeAdapter for GSettingsAdapter<Provider>
 where
     Provider: SettingsProvider,
 {
-    fn setup_mode_change_listener(&self, changes: Sender<ColorMode>) {
+    fn run_daemon(&self, verbose: bool) {
+        let (sender, receiver): (Sender<ColorMode>, Receiver<ColorMode>) = channel();
+
         self.settings
             .connect("changed::color-scheme", true, move |_| {
                 // `Settings` are (at the time of writing) not sync+send, so we
@@ -62,12 +69,19 @@ where
                 println!("read colorscheme: {read_mode}");
 
                 // FIXME: Maybe rather log or simply disconnect the listener?
-                changes.send(read_mode).unwrap();
+                sender.send(read_mode).unwrap();
                 None
             });
+
+        println!("😈 Listening for color mode changes...");
+        loop {
+            // FIXME: Actually handle errors here
+            let new_mode = receiver.recv().unwrap();
+            run_scripts(new_mode, verbose, true);
+        }
     }
 
-    fn current_mode(&self) -> ColorMode {
-        Provider::get_color_mode(&self.settings)
+    fn current_mode(&self) -> Result<ColorMode, Box<(dyn Error)>> {
+        Ok(Provider::get_color_mode(&self.settings))
     }
 }
