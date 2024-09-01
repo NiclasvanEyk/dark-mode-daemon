@@ -12,7 +12,7 @@ use clap::ValueEnum;
 use crate::platform::macos::MacOSNativeAdapter;
 
 #[cfg(target_os = "linux")]
-use gsettings::{
+use crate::platform::linux::gsettings::{
     freedesktop::FreeDesktopSettingsProvider, gnome::GnomeDesktopSettingsProvider,
     GSettingsAdapter, SettingsProviderImplementation,
 };
@@ -43,10 +43,10 @@ fn main() {
 
     match implementation {
         SettingsProviderImplementation::Gnome => {
-            dark_mode_daemon::cli::run(GSettingsAdapter::<GnomeDesktopSettingsProvider>::new());
+            crate::cli::run(GSettingsAdapter::<GnomeDesktopSettingsProvider>::new());
         }
         SettingsProviderImplementation::Freedesktop => {
-            dark_mode_daemon::cli::run(GSettingsAdapter::<FreeDesktopSettingsProvider>::new());
+            crate::cli::run(GSettingsAdapter::<FreeDesktopSettingsProvider>::new());
         }
     };
 }

@@ -1,0 +1,71 @@
+name: Integration Tests
+
+on:
+  push:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo build --verbose
+      - name: Prepare Scripts
+        run: |
+          mkdir -p $HOME/.config/dark-mode-daemon/scripts/
+          cat <<EOF > $HOME/.config/dark-mode-daemon/scripts/executable.sh
+          #!/usr/bin/env bash
+          echo "scripts ran" >> $HOME/protocol.txt
+          EOF
+          chmod +x $HOME/.config/dark-mode-daemon/scripts/executable.sh
+      - name: Run Daemon
+        run: cargo run --verbose -- daemon &
+      - name: Switch Mode
+        # TODO: Actually switch the mode
+        run: echo "Switching mode..."
+      - name: Assert Scripts Did Ran
+        run: |
+          sleep 5
+          # Once when starting the scripts
+          echo "scripts ran" >> $HOME/expected.txt
+          # Once for when we toggled the mode
+          echo "scripts ran" >> $HOME/expected.txt
+          diff $HOME/expected.txt $HOME/protocol.txt
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo build --verbose
+      - name: Prepare Scripts
+        run: |
+          mkdir -p $HOME/.config/dark-mode-daemon/scripts/
+          cat <<EOF > $HOME/.config/dark-mode-daemon/scripts/executable.sh
+          #!/usr/bin/env bash
+          echo "scripts ran" >> $HOME/protocol.txt
+          EOF
+          chmod +x $HOME/.config/dark-mode-daemon/scripts/executable.sh
+      - name: Run Daemon
+        run: cargo run --verbose -- daemon &
+      - name: Switch Mode
+        run: osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
+      - name: Assert Scripts Did Ran
+        run: |
+          sleep 5
+          # Once when starting the scripts
+          echo "scripts ran" >> $HOME/expected.txt
+          # Once for when we toggled the mode
+          echo "scripts ran" >> $HOME/expected.txt
+          diff $HOME/expected.txt $HOME/protocol.txt
+
+  # windows:
+  #   runs-on: windows-latest
+  #   # TODO: Continue
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Build
+  #       run: cargo build --verbose
