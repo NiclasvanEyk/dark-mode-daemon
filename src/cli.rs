@@ -5,7 +5,7 @@ use clap::{Parser, Subcommand};
 use crate::{
     discovery::{ScriptsDirectory, ScriptsDirectoryEntryKind},
     execution::run_scripts,
-    platform_specifics::NativeAdapter,
+    platform::NativeAdapter,
     ColorMode,
 };
 

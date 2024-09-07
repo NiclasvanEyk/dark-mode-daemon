@@ -5,7 +5,7 @@ use std::sync::mpsc::{channel, Receiver};
 use std::{marker::PhantomData, sync::mpsc::Sender};
 
 use crate::execution::run_scripts;
-use crate::{platform_specifics::NativeAdapter, ColorMode};
+use crate::{platform::NativeAdapter, ColorMode};
 use gio::prelude::ObjectExt;
 use gio::Settings;
 

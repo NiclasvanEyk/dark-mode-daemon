@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::{execution::run_scripts, platform_specifics::NativeAdapter, ColorMode};
+use crate::{execution::run_scripts, platform::NativeAdapter, ColorMode};
 use block2::RcBlock;
 use objc2_app_kit::NSApplication;
 use objc2_foundation::{ns_string, MainThreadMarker, NSDistributedNotificationCenter};

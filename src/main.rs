@@ -1,10 +1,16 @@
 use std::fmt::Display;
 
+/// Contains the command line interface.
 pub mod cli;
+
+/// How and where to find the scripts to execute.
 pub mod discovery;
+
+/// How the scripts are run.
 pub mod execution;
+
+/// The platform-specific parts.
 pub mod platform;
-pub mod platform_specifics;
 
 use clap::ValueEnum;
 
