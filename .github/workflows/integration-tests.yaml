@@ -13,6 +13,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build
         run: cargo build --verbose
+      - name: Install Gnome and friends
+        run: |
+          sudo apt update
+          sudo apt install ubuntu-desktop -y
       - name: Prepare Scripts
         run: |
           mkdir -p $HOME/.config/dark-mode-daemon/scripts/
@@ -24,8 +28,7 @@ jobs:
       - name: Run Daemon
         run: cargo run --verbose -- daemon &
       - name: Switch Mode
-        # TODO: Actually switch the mode
-        run: echo "Switching mode..."
+        run: gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
       - name: Assert Scripts Did Ran
         run: |
           sleep 5
