@@ -51,6 +51,7 @@ pub(crate) enum ScriptsDirectoryEntryError {
 
 pub(crate) struct ScriptsDirectory {
     dir: ReadDir,
+    pub path: PathBuf,
 }
 
 impl ScriptsDirectory {
@@ -66,6 +67,7 @@ impl ScriptsDirectory {
 
         Ok(Self {
             dir: scripts_iterator,
+            path: scripts_directory,
         })
     }
 }

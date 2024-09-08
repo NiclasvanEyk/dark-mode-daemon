@@ -1,6 +1,14 @@
-use std::process::{exit, Command, Stdio};
+use std::{
+    path::PathBuf,
+    process::{exit, Child, Command, Stdio},
+};
 
-use crate::{discovery::ScriptsDirectoryEntryKind, ColorMode};
+use crate::{discovery::ScriptsDirectoryEntryKind, mode::ColorMode};
+
+struct ScriptExecution {
+    script: PathBuf,
+    process: Child,
+}
 
 pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
     let scripts_directory = match crate::discovery::ScriptsDirectory::read() {
@@ -12,6 +20,7 @@ pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
         }
     };
 
+    let mut executions: Vec<ScriptExecution> = Vec::new();
     for iteration_result in scripts_directory {
         let entry = match iteration_result {
             Ok(entry) => entry,
@@ -52,13 +61,10 @@ pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
                 command.env("DMD_COLOR_MODE", mode.to_string());
 
                 if pipe_stdio {
-                    command
-                        .stdin(Stdio::inherit())
-                        .stdout(Stdio::inherit())
-                        .stderr(Stdio::inherit());
+                    command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
                 }
 
-                let mut child = match command.spawn() {
+                let child = match command.spawn() {
                     Ok(child) => child,
                     Err(error) => {
                         println!("❌ Failed to launch '{}': {error}", path.to_string_lossy());
@@ -66,18 +72,26 @@ pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
                     }
                 };
 
-                let status = match child.wait() {
-                    Ok(status) => status,
-                    Err(error) => {
-                        println!("❌ Script '{}' failed: {error}", path.to_string_lossy());
-                        continue;
-                    }
-                };
-
-                if !status.success() {
-                    println!("❌ Script '{}' failed!", path.to_string_lossy());
-                }
+                executions.push(ScriptExecution {
+                    script: path,
+                    process: child,
+                });
             }
+        }
+    }
+
+    for mut execution in executions {
+        let path = execution.script;
+        let status = match execution.process.wait() {
+            Ok(status) => status,
+            Err(error) => {
+                println!("❌ Script '{}' failed: {error}", path.to_string_lossy());
+                continue;
+            }
+        };
+
+        if !status.success() {
+            println!("❌ Script '{}' failed!", path.to_string_lossy());
         }
     }
 }

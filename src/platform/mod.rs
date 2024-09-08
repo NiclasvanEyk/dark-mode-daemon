@@ -4,7 +4,7 @@ pub mod macos;
 #[cfg(target_os = "linux")]
 pub mod linux;
 
-use crate::ColorMode;
+use crate::mode::ColorMode;
 use std::error::Error;
 
 /// Adapter that encapsulates platform-specific parts of dark mode daemon.

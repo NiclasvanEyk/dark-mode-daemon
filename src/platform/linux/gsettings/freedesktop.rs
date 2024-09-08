@@ -1,4 +1,4 @@
-use crate::ColorMode;
+use crate::mode::ColorMode;
 use gio::{prelude::SettingsExtManual, Settings};
 
 use super::SettingsProvider;

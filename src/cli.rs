@@ -1,12 +1,15 @@
-use std::process::exit;
+use std::{
+    io::{self, IsTerminal},
+    process::exit,
+};
 
 use clap::{Parser, Subcommand};
 
 use crate::{
     discovery::{ScriptsDirectory, ScriptsDirectoryEntryKind},
     execution::run_scripts,
+    mode::ColorMode,
     platform::NativeAdapter,
-    ColorMode,
 };
 
 #[derive(Parser)]
@@ -72,6 +75,7 @@ where
         }
         Command::Run { mode, verbose } => run_scripts(mode, verbose, true),
         Command::List { resolve, verbose } => {
+            let environment = Environment::infer();
             let scripts_directory = match ScriptsDirectory::read() {
                 Ok(directory) => directory,
                 Err(error) => {
@@ -80,6 +84,13 @@ where
                     exit(-1);
                 }
             };
+
+            if !environment.piped {
+                println!(
+                    "📂 Using scripts in {}...\n",
+                    scripts_directory.path.to_string_lossy()
+                );
+            }
 
             for iteration_result in scripts_directory {
                 let entry = match iteration_result {
@@ -111,6 +122,20 @@ where
                     }
                 }
             }
+        }
+    }
+}
+
+pub struct Environment {
+    /// Whether the current command is being piped into something.
+    piped: bool,
+}
+
+impl Environment {
+    pub fn infer() -> Self {
+        let is_terminal = io::stdin().is_terminal();
+        Self {
+            piped: !is_terminal,
         }
     }
 }
