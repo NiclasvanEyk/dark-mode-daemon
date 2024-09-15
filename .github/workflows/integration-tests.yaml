@@ -65,10 +65,25 @@ jobs:
           echo "scripts ran" >> $HOME/expected.txt
           diff $HOME/expected.txt $HOME/protocol.txt
 
-  # windows:
-  #   runs-on: windows-latest
-  #   # TODO: Continue
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Build
-  #       run: cargo build --verbose
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo build --verbose
+      - name: Prepare Scripts
+        run: |
+          New-Item -Path "$env:USERPROFILE/.config/dark-mode-daemon/scripts/" -ItemType Directory
+          'Add-Content -Path $env:USERPROFILE/protocol.txt -Value "scripts ran"' | Out-File -FilePath "$env:USERPROFILE/.config/dark-mode-daemon/scripts/executable.ps1"
+      - name: Run Daemon
+        run: cargo run --verbose -- daemon &
+      - name: Switch Mode
+        run: New-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0 -Type Dword -Force; New-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0 -Type Dword -Force
+      - name: Assert Scripts Did Ran
+        run: |
+          Start-Sleep -Seconds 5
+          # Once when starting the scripts
+          Add-Content -Path "$env:USERPROFILE/expected.txt" -Value "scripts ran"
+          # Once for when we toggled the mode
+          Add-Content -Path "$env:USERPROFILE/expected.txt" -Value "scripts ran"
+          Compare-Object expected.txt protocol.txt
