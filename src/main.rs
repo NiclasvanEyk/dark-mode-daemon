@@ -14,29 +14,11 @@ pub mod mode;
 pub mod platform;
 
 #[cfg(target_os = "macos")]
-use crate::platform::macos::MacOSNativeAdapter;
-
-#[cfg(target_os = "macos")]
 fn main() {
-    crate::cli::run(MacOSNativeAdapter::default());
+    crate::cli::run(crate::platform::macos::MacOSNativeAdapter);
 }
 
 #[cfg(target_os = "linux")]
-use crate::platform::linux::gsettings::{
-    freedesktop::FreeDesktopSettingsProvider, gnome::GnomeDesktopSettingsProvider,
-    GSettingsAdapter, SettingsProviderImplementation,
-};
-
-#[cfg(target_os = "linux")]
 fn main() {
-    let implementation = SettingsProviderImplementation::Gnome;
-
-    match implementation {
-        SettingsProviderImplementation::Gnome => {
-            crate::cli::run(GSettingsAdapter::<GnomeDesktopSettingsProvider>::new());
-        }
-        SettingsProviderImplementation::Freedesktop => {
-            crate::cli::run(GSettingsAdapter::<FreeDesktopSettingsProvider>::new());
-        }
-    };
+    crate::cli::run(crate::platform::linux::LinuxAdapter::default());
 }
