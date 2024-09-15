@@ -6,7 +6,7 @@ use objc2_app_kit::NSApplication;
 use objc2_foundation::{ns_string, MainThreadMarker, NSDistributedNotificationCenter};
 
 #[derive(Default)]
-pub(crate) struct MacOSNativeAdapter {}
+pub(crate) struct MacOsAdapter {}
 
 fn current_mode() -> Result<ColorMode, Box<dyn Error>> {
     unsafe {
@@ -28,7 +28,7 @@ fn current_mode() -> Result<ColorMode, Box<dyn Error>> {
     }
 }
 
-impl NativeAdapter for MacOSNativeAdapter {
+impl NativeAdapter for MacOsAdapter {
     fn run_daemon(&self, verbose: bool) {
         unsafe {
             let notification_center = NSDistributedNotificationCenter::defaultCenter();

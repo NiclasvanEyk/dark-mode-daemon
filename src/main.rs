@@ -15,10 +15,15 @@ pub mod platform;
 
 #[cfg(target_os = "macos")]
 fn main() {
-    crate::cli::run(crate::platform::macos::MacOSNativeAdapter);
+    crate::cli::run(crate::platform::macos::MacOsAdapter::default());
 }
 
 #[cfg(target_os = "linux")]
 fn main() {
-    crate::cli::run(crate::platform::linux::LinuxAdapter::default());
+    crate::cli::run(crate::platform::dark_light::DarkLightAdapter::default());
+}
+
+#[cfg(target_os = "windows")]
+fn main() {
+    crate::cli::run(crate::platform::dark_light::DarkLightAdapter::default());
 }

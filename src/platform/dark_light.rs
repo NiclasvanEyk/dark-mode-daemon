@@ -7,7 +7,7 @@ use crate::execution::run_scripts;
 use crate::{mode::ColorMode, platform::NativeAdapter};
 
 #[derive(Default)]
-pub struct LinuxAdapter {}
+pub struct DarkLightAdapter {}
 
 async fn run_scripts_on_mode_change(verbose: bool) -> anyhow::Result<()> {
     while let Some(mode) = dark_light::subscribe().await?.next().await {
@@ -21,7 +21,8 @@ async fn run_scripts_on_mode_change(verbose: bool) -> anyhow::Result<()> {
 
     Ok(())
 }
-impl NativeAdapter for LinuxAdapter {
+
+impl NativeAdapter for DarkLightAdapter {
     fn run_daemon(&self, verbose: bool) {
         tokio::runtime::Builder::new_multi_thread()
             .enable_all()
