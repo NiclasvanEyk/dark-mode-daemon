@@ -5,3 +5,33 @@ edition = "2021"
 
 [dependencies]
 xdg = "2.5.2"
+clap = { version = "4.5.16", features = ["derive"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+block2 = "0.5.1"
+objc2 = { version = "0.5.2" }
+objc2-app-kit = { version = "0.2.2", features = [
+  "NSApplication",
+  "NSResponder",
+] }
+objc2-foundation = { version = "0.2.2", features = [
+  "NSNotification",
+  "NSDistributedNotificationCenter",
+  "NSOperation",
+  "NSString",
+  "NSThread",
+  "NSUserDefaults",
+  "block2",
+] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+dark-light = { git = "https://github.com/frewsxcv/rust-dark-light", version = "1.1.1", rev = "77ae4349f11a556cef9c683803a832f171253479" }
+futures = "0.3.30"
+tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread"] }
+anyhow = "1.0.89"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+dark-light = { git = "https://github.com/frewsxcv/rust-dark-light", version = "1.1.1", rev = "77ae4349f11a556cef9c683803a832f171253479" }
+futures = "0.3.30"
+tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread"] }
+anyhow = "1.0.89"
