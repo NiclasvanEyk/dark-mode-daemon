@@ -47,10 +47,9 @@ impl NativeAdapter for MacOsAdapter {
         };
 
         let mtm = MainThreadMarker::new().expect("must be on the main thread");
-        unsafe {
-            println!("😈 Listening for color mode changes...");
-            NSApplication::sharedApplication(mtm).run();
-        }
+
+        println!("😈 Listening for color mode changes...");
+        NSApplication::sharedApplication(mtm).run();
     }
 
     fn current_mode(&self) -> Result<ColorMode, Box<dyn Error>> {

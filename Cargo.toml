@@ -5,16 +5,16 @@ edition = "2021"
 
 [dependencies]
 xdg = "2.5.2"
-clap = { version = "4.5.16", features = ["derive"] }
+clap = { version = "4.5.32", features = ["derive"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-block2 = "0.5.1"
-objc2 = { version = "0.5.2" }
-objc2-app-kit = { version = "0.2.2", features = [
+block2 = "0.6.0"
+objc2 = { version = "0.6.0" }
+objc2-app-kit = { version = "0.3.0", features = [
   "NSApplication",
   "NSResponder",
 ] }
-objc2-foundation = { version = "0.2.2", features = [
+objc2-foundation = { version = "0.3.0", features = [
   "NSNotification",
   "NSDistributedNotificationCenter",
   "NSOperation",
@@ -26,12 +26,12 @@ objc2-foundation = { version = "0.2.2", features = [
 
 [target.'cfg(target_os = "linux")'.dependencies]
 dark-light = "2.0.0"
-futures = "0.3.30"
-tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread"] }
-anyhow = "1.0.89"
+futures = "0.3.31"
+tokio = { version = "1.44.1", features = ["rt", "rt-multi-thread"] }
+anyhow = "1.0.97"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 dark-light = "2.0.0"
-futures = "0.3.30"
-tokio = { version = "1.40.0", features = ["rt", "rt-multi-thread"] }
-anyhow = "1.0.89"
+futures = "0.3.31"
+tokio = { version = "1.44.1", features = ["rt", "rt-multi-thread"] }
+anyhow = "1.0.97"
