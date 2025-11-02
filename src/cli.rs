@@ -9,7 +9,7 @@ use crate::{
     discovery::{ScriptsDirectory, ScriptsDirectoryEntryKind},
     execution::run_scripts,
     mode::ColorMode,
-    platform::NativeAdapter,
+    platform::{ColorModeDaemon, ColorModeDetector},
 };
 
 #[derive(Parser)]
@@ -19,7 +19,7 @@ use crate::{
 #[command(version, long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
-    command: Command,
+    command: Option<Command>,
 }
 
 #[derive(Subcommand)]
@@ -31,7 +31,17 @@ pub enum Command {
     },
 
     /// Prints the current color mode.
-    Current,
+    Current {
+        /// Whether to not only print the current color mode once, but also
+        /// print it again if it changes (without running any scripts).
+        #[arg(short, long)]
+        watch: bool,
+
+        /// Whether to only print the name, without any emojis.
+        /// Useful for using this in a programatic way.
+        #[arg(short, long)]
+        plain: bool,
+    },
 
     /// Manually run scripts for testing.
     Run {
@@ -53,25 +63,52 @@ pub enum Command {
     },
 }
 
-pub fn run<Adapter>(native_adapter: Adapter)
+pub async fn run<F, Futu, Daemon>(native_adapter: F) -> anyhow::Result<()>
 where
-    Adapter: NativeAdapter,
+    Futu: std::future::Future<Output = anyhow::Result<Daemon>>,
+    F: FnOnce() -> Futu,
+    Daemon: ColorModeDaemon + ColorModeDetector,
 {
     let cli = Cli::parse();
+    let command = cli
+        .command
+        .unwrap_or_else(|| Command::Daemon { verbose: false });
 
-    match cli.command {
+    match command {
         Command::Daemon { verbose } => {
+            let adapter = native_adapter().await?;
             println!("😈 Running scripts initially for current color mode...");
             // FIXME: Actually handle errors here
-            let mode = native_adapter.current_mode().unwrap();
+            let mode = adapter.current_mode().await.unwrap();
             run_scripts(mode, verbose, true);
 
             println!("😈 Spawning daemon...");
-            native_adapter.run_daemon(verbose);
+            adapter
+                .on_color_changed(|mode| run_scripts(mode, verbose, true))
+                .await;
         }
-        Command::Current => {
+        Command::Current { watch, plain } => {
             // FIXME: error handling
-            println!("{}", native_adapter.current_mode().unwrap());
+            let adapter = native_adapter().await?;
+            let mode = adapter.current_mode().await.unwrap();
+            if plain {
+                println!("{}", mode);
+            } else {
+                println!("{} {}", mode.emoji(), mode);
+            }
+            if !watch {
+                return Ok(());
+            }
+
+            adapter
+                .on_color_changed(|mode| {
+                    if plain {
+                        println!("{}", mode);
+                    } else {
+                        println!("{} {}", mode.emoji(), mode);
+                    }
+                })
+                .await;
         }
         Command::Run { mode, verbose } => run_scripts(mode, verbose, true),
         Command::List { resolve, verbose } => {
@@ -123,7 +160,9 @@ where
                 }
             }
         }
-    }
+    };
+
+    Ok(())
 }
 
 pub struct Environment {

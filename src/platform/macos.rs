@@ -29,7 +29,11 @@ fn current_mode() -> Result<ColorMode, Box<dyn Error>> {
 }
 
 impl NativeAdapter for MacOsAdapter {
-    fn run_daemon(&self, verbose: bool) {
+    /// Implementation of the deamon, which differs between OSes.
+    fn run_daemon<F>(&self, on_color_detected: F, verbose: bool)
+    where
+        F: Fn(ColorMode),
+    {
         unsafe {
             let notification_center = NSDistributedNotificationCenter::defaultCenter();
 
@@ -41,7 +45,7 @@ impl NativeAdapter for MacOsAdapter {
                 None,
                 &RcBlock::new(move |_| {
                     // FIXME: Error handling
-                    run_scripts(current_mode().unwrap(), verbose, true);
+                    on_color_detected(current_mode().unwrap());
                 }),
             );
         };

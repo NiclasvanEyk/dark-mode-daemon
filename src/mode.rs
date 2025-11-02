@@ -15,3 +15,19 @@ impl Display for ColorMode {
         }
     }
 }
+
+impl ColorMode {
+    pub fn other(&self) -> ColorMode {
+        match self {
+            ColorMode::Light => ColorMode::Dark,
+            ColorMode::Dark => ColorMode::Light,
+        }
+    }
+
+    pub fn emoji(&self) -> String {
+        match self {
+            ColorMode::Light => String::from("🌞"),
+            ColorMode::Dark => String::from("🌌"),
+        }
+    }
+}

@@ -92,6 +92,8 @@ pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
 
         if !status.success() {
             println!("❌ Script '{}' failed!", path.to_string_lossy());
+        } else {
+            println!("✅ Script '{}' succeeded!", path.to_string_lossy());
         }
     }
 }
