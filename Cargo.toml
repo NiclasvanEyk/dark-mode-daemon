@@ -2,6 +2,9 @@
 name = "dark-mode-daemon"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/NiclasvanEyk/dark-mode-daemon"
+homepage = "https://github.com/NiclasvanEyk/dark-mode-daemon"
+description = "😈 Run scripts when the system color scheme changes between light and dark."
 
 [dependencies]
 xdg = "2.5.2"
@@ -30,5 +33,7 @@ objc2-foundation = { version = "0.3.0", features = [
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = "0.12.0"
 
-[target.'cfg(target_os = "windows")'.dependencies]
-dark-light = "2.0.0"
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

@@ -26,8 +26,3 @@ async fn main() {
     let cli_result = crate::cli::run(detector_factory).await;
     handle_cli_result(cli_result);
 }
-
-#[cfg(target_os = "windows")]
-fn main() {
-    crate::cli::run(crate::platform::dark_light::DarkLightAdapter::default());
-}
