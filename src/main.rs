@@ -12,8 +12,11 @@ fn handle_cli_result(result: anyhow::Result<()>) {
 }
 
 #[cfg(target_os = "macos")]
-fn main() {
-    crate::cli::run(crate::platform::macos::MacOsAdapter::default());
+#[tokio::main]
+async fn main() {
+    let detector_factory = async || Ok(crate::platform::macos::MacOsColorModeDetector::default());
+    let cli_result = crate::cli::run(detector_factory).await;
+    handle_cli_result(cli_result);
 }
 
 #[cfg(target_os = "linux")]

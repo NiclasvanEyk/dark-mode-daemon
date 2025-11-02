@@ -30,7 +30,7 @@ pub trait NativeAdapter {
 pub trait ColorModeDaemon {
     fn on_color_changed<F>(&self, callback: F) -> impl std::future::Future<Output = ()>
     where
-        F: Fn(ColorMode);
+        F: Fn(ColorMode) + 'static;
 }
 
 pub trait ColorModeDetector {

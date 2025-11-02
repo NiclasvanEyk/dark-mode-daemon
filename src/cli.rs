@@ -84,7 +84,7 @@ where
 
             println!("😈 Spawning daemon...");
             adapter
-                .on_color_changed(|mode| run_scripts(mode, verbose, true))
+                .on_color_changed(move |mode| run_scripts(mode, verbose, true))
                 .await;
         }
         Command::Current { watch, plain } => {
@@ -101,7 +101,7 @@ where
             }
 
             adapter
-                .on_color_changed(|mode| {
+                .on_color_changed(move |mode| {
                     if plain {
                         println!("{}", mode);
                     } else {

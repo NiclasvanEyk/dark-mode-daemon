@@ -1,14 +1,49 @@
-use std::error::Error;
-
-use crate::{execution::run_scripts, mode::ColorMode, platform::NativeAdapter};
+use crate::{
+    mode::ColorMode,
+    platform::{ColorModeDaemon, ColorModeDetector},
+};
 use block2::RcBlock;
 use objc2_app_kit::NSApplication;
 use objc2_foundation::{ns_string, MainThreadMarker, NSDistributedNotificationCenter};
 
 #[derive(Default)]
-pub(crate) struct MacOsAdapter {}
+pub struct MacOsColorModeDetector {}
 
-fn current_mode() -> Result<ColorMode, Box<dyn Error>> {
+impl ColorModeDetector for MacOsColorModeDetector {
+    async fn current_mode(&self) -> anyhow::Result<ColorMode> {
+        current_mode()
+    }
+}
+
+impl ColorModeDaemon for MacOsColorModeDetector {
+    async fn on_color_changed<F>(&self, callback: F)
+    where
+        F: Fn(ColorMode) + 'static,
+    {
+        let execute_callback = RcBlock::new(move |_| {
+            // FIXME: Error handling
+            callback(current_mode().unwrap());
+        });
+
+        unsafe {
+            let notification_center = NSDistributedNotificationCenter::defaultCenter();
+
+            let name = ns_string!("AppleInterfaceThemeChangedNotification");
+            notification_center.addObserverForName_object_queue_usingBlock(
+                Some(name),
+                None,
+                None,
+                &execute_callback,
+            );
+        };
+
+        let mtm = MainThreadMarker::new().expect("must be on the main thread");
+
+        NSApplication::sharedApplication(mtm).run();
+    }
+}
+
+fn current_mode() -> anyhow::Result<ColorMode> {
     unsafe {
         let defaults = objc2_foundation::NSUserDefaults::standardUserDefaults();
 
@@ -25,38 +60,5 @@ fn current_mode() -> Result<ColorMode, Box<dyn Error>> {
         }
 
         Ok(ColorMode::Light)
-    }
-}
-
-impl NativeAdapter for MacOsAdapter {
-    /// Implementation of the deamon, which differs between OSes.
-    fn run_daemon<F>(&self, on_color_detected: F, verbose: bool)
-    where
-        F: Fn(ColorMode),
-    {
-        unsafe {
-            let notification_center = NSDistributedNotificationCenter::defaultCenter();
-
-            println!("Adding observer...");
-            let name = ns_string!("AppleInterfaceThemeChangedNotification");
-            notification_center.addObserverForName_object_queue_usingBlock(
-                Some(name),
-                None,
-                None,
-                &RcBlock::new(move |_| {
-                    // FIXME: Error handling
-                    on_color_detected(current_mode().unwrap());
-                }),
-            );
-        };
-
-        let mtm = MainThreadMarker::new().expect("must be on the main thread");
-
-        println!("😈 Listening for color mode changes...");
-        NSApplication::sharedApplication(mtm).run();
-    }
-
-    fn current_mode(&self) -> Result<ColorMode, Box<dyn Error>> {
-        current_mode()
     }
 }
