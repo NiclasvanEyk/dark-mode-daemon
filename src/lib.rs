@@ -1,6 +1,9 @@
 /// Contains the command line interface.
 pub mod cli;
 
+/// Configuraition.
+pub mod config;
+
 /// How and where to find the scripts to execute.
 pub mod discovery;
 

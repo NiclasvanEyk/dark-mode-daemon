@@ -61,6 +61,29 @@ pub enum Command {
         #[arg(short, long)]
         verbose: bool,
     },
+
+    #[cfg(target_os = "linux")]
+    Autostart {
+        #[command(subcommand)]
+        command: LinuxAutostartCommand,
+    },
+}
+
+/// Utilities for easily running the daemon on boot.
+#[derive(Subcommand, Debug)]
+pub enum LinuxAutostartCommand {
+    /// Create the startup file
+    Setup {
+        #[arg(short, long)]
+        binary_path: Option<std::path::PathBuf>,
+
+        #[arg(short, long)]
+        override_existing_entry: bool,
+    },
+    /// Check if the startup file exists
+    Check,
+    /// Remove the startup file
+    Remove,
 }
 
 pub async fn run<F, Futu, Daemon>(native_adapter: F) -> anyhow::Result<()>
@@ -111,6 +134,31 @@ where
                 .await;
         }
         Command::Run { mode, verbose } => run_scripts(mode, verbose, true),
+        #[cfg(target_os = "linux")]
+        Command::Autostart { command } => match command {
+            LinuxAutostartCommand::Setup {
+                binary_path,
+                override_existing_entry,
+            } => crate::platform::linux::autostart::install_autostart_xdg(
+                binary_path,
+                override_existing_entry,
+            )?,
+            LinuxAutostartCommand::Check => {
+                if crate::platform::linux::autostart::is_setup()? {
+                    println!("Autostart file exists!");
+                } else {
+                    println!("Autostart not configured!");
+                }
+            }
+            LinuxAutostartCommand::Remove => {
+                if !crate::platform::linux::autostart::is_setup()? {
+                    println!("Autostart not configured, nothing to remove");
+                    return Ok(());
+                }
+
+                crate::platform::linux::autostart::remove()?;
+            }
+        },
         Command::List { resolve, verbose } => {
             let environment = Environment::infer();
             let scripts_directory = match ScriptsDirectory::read() {
