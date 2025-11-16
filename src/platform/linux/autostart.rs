@@ -114,6 +114,9 @@ X-GNOME-Autostart-enabled=true
         "Successfully created autostart entry at '{}'",
         autostart_entry_path.display()
     );
+    println!("The next time you login, dark-mode-daemon should be started automatically.");
+    println!("If you want to test it, you can log out and in again (no restart necessary). Alternatively you can run\n\n");
+    println!("\tnohup dark-mode-daemon > /dev/null 2>&1 &");
 
     Ok(())
 }

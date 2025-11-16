@@ -125,7 +125,7 @@ pub fn install_autostart_xdg(
     println!("To start the script now, execute the following:");
     println!("1. Load the agent\n");
     println!("\tlaunchctl load {}", autostart_entry_path.display());
-    println!("\n\n2. Start the agent\n");
+    println!("\n2. Start the agent\n");
     println!("\tlaunchctl start {DMD_IDENTIFIER}");
 
     Ok(())
