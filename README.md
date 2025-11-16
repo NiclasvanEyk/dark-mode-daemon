@@ -4,17 +4,19 @@ Run scripts when the system color scheme changes between light and dark.
 
 ## Installation
 
-For now, simply use [Homebrew](https://brew.sh) is the easiest option:
+First install the binary
 
 ```shell
-# 1. Install the binary
-brew install NiclasvanEyk/dark-mode-daemon/dark-mode-daemon
-
-# 2. (optional) Launch the daemon on system start
-brew services start dark-mode-daemon
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/niclasvaneyk/dark-mode-daemon/releases/latest/download/dark-mode-daemon-installer.sh | sh
 ```
 
-Note that if you don't run the second step, you can still manually watch for changes using `dark-mode-daemon daemon`.
+Then you may also configure it to be launched at login
+
+```
+dark-mode-daemon autostart setup
+```
+
+Note that if you don't run the second step, you can still manually watch for changes using `dark-mode-daemon`.
 
 ## Usage
 
