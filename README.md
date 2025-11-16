@@ -2,77 +2,32 @@
 
 Run scripts when the system color scheme changes between light and dark.
 
-## Installation
+## Getting Started
 
-First install the binary
+The easiest way is to download and run the official installation script
 
 ```shell
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/niclasvaneyk/dark-mode-daemon/releases/latest/download/dark-mode-daemon-installer.sh | sh
 ```
 
-Then you may also configure it to be launched at login
+Then you can run the watch process by running
+
+```
+dark-mode-daemon
+```
+
+This won't do much, since you probably haven't set up any scripts yet.
+Dark Mode Daemon runs every executable file in  `~/.config/dark-mode-daemon/scripts/` and sets the `DMD_COLOR_MODE` environment variable to either `light` or `dark`.
+This lets you adjust configuration files, other environment variables, or whatever else you can come up with.
+Head over to the [list of recipes](./docs/recipes.md) for inspiration.
+Examples include adding automatic color adjustments for [Alacritty](./docs/recipes.md#alacritty), [Helix](./docs/recipes.md#helix), [Fish](./docs/recipes.md#fish), and more.
+
+You likely want to have Dark Mode Daemon launch in the background when you log into your user.
+There are many solutions to this, but we've prepared a builtin solution that should work for most platforms
 
 ```
 dark-mode-daemon autostart setup
 ```
 
-Note that if you don't run the second step, you can still manually watch for changes using `dark-mode-daemon`.
+If you are interested in how this or the color mode detection works, have a look at our [behind the scenes documentation](./docs/how-it-works.md).
 
-## Usage
-
-Create a new directory for scripts that should be run when changing color modes:
-
-```shell
-mkdir $HOME/.config/dark-mode-daemon/scripts
-```
-
-> Alternatively use `$XDG_CONFIG_HOME` instead of `$HOME/.config` if you configured it
-
-Then create as many scripts there as you like, but don't forget to make them executable.
-They will be automatically be run when changing between dark and light mode.
-The `DMD_COLOR_MODE` environment variable will be either set to `light` or `dark`, depending on the new mode.
-
-### Example
-
-The original motivation for creating this program was to sync theming environment variables, such as [difftastics `DFT_BACKGROUND`](https://github.com/Wilfred/difftastic) or [bats `BAT_THEME`](https://github.com/sharkdp/bat) with the current operating system color scheme.
-But lets use a more impractical example.
-
-MacOS includes `say`, a text-to-speech program available on the command line.
-We can use this to loudly announce our dark mode changes.
-
-First we create the script 
-
-```shell
-touch $HOME/.config/dark-mode-daemon/scripts/announce.sh
-```
-
-Then fill it with the following content
-
-```shell
-#!/usr/bin/env bash
-
-say "Changed to $DMD_COLOR_MODE mode"
-```
-
-finally make it executable
-
-```shell
-chmod +x $HOME/.config/dark-mode-daemon/scripts/announce.sh
-```
-
-You can verify that it will be run using
-
-```shell
-dark-mode-daemon list
-```
-
-this should print something like the following:
-
-```
-📂 Using scripts in /Users/youruser/.config/dark-mode-daemon/scripts...
-
-/Users/youruser/.config/dark-mode-daemon/scripts/announce.sh
-```
-
-Now turn your volume up, toggle dark mode, and be amazed at the result.
-Or create more useful scripts that adjust your terminal emulator, vim/emacs/editor theme, or something totally different.
