@@ -1,11 +1,8 @@
 use clap::ValueEnum;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
-#[derive(
-    Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, JsonSchema)]
 pub enum ColorMode {
     Light,
     Dark,

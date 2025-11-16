@@ -10,7 +10,7 @@ struct ScriptExecution {
     process: Child,
 }
 
-pub fn run_scripts(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
+pub fn run(mode: ColorMode, verbose: bool, pipe_stdio: bool) {
     let scripts_directory = match crate::discovery::ScriptsDirectory::read() {
         Ok(directory) => directory,
         Err(error) => {

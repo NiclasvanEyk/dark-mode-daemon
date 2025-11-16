@@ -1,3 +1,5 @@
+pub mod autostart;
+
 use crate::{
     mode::ColorMode,
     platform::{ColorModeDaemon, ColorModeDetector},

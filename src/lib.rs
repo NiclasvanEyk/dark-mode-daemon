@@ -1,14 +1,8 @@
 /// Contains the command line interface.
 pub mod cli;
 
-/// Configuraition.
-pub mod config;
-
 /// How and where to find the scripts to execute.
 pub mod discovery;
-
-/// How the scripts are run.
-pub mod execution;
 
 /// The color mode struct.
 pub mod mode;
